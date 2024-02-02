@@ -103,9 +103,119 @@ describe('Restaurants API', () => {
         ),
       );
     });
+
+    it('should return the correct results with pagination', async () => {
+      const res = await service.getRestaurants({ limit: 1, offset: 0 });
+      expect(res.results).toHaveLength(1);
+    });
+
+    it('should return the correct results with pagination', async () => {
+      const res = await service.getRestaurants({ limit: 1, offset: 1 });
+      expect(res.results).toHaveLength(1);
+    });
   });
 
-  it('should get a restaurant by id', async () => {});
+  describe('getRestaurantById', () => {
+    const restaurant = {
+      name: 'Test Restaurant',
+      categoryId: 1,
+      kakaoId: '12345678',
+      address: 'Test Address',
+      latitude: '123.45678',
+      longitude: '123.45678',
+      menus: ['Test Menus'],
+      images: ['Test Images'],
+      homepage: 'Test Homepage',
+      phone: '012-3456-7890',
+    };
+    beforeAll(async () => {
+      await service.addRestaurant(restaurant);
+    });
 
-  it('should update a restaurant', async () => {});
+    it('should get a restaurant by id', async () => {
+      const res = await service.getRestaurantById(1);
+      expect(res).toHaveLength(1);
+      expect(res.restaurant).toEqual({
+        ...restaurant,
+        id: expect.any(Number),
+        createdAt: expect.any(Date),
+        updatedAt: expect.any(Date),
+      });
+    });
+
+    it('should return null if the restaurant does not exist', async () => {
+      const res = await service.getRestaurantById(2);
+      expect(res).toBeNull();
+    });
+  });
+
+  describe('updateRestaurant', () => {
+    const restaurant = {
+      name: 'Test Restaurant',
+      categoryId: 1,
+      kakaoId: '12345678',
+      address: 'Test Address',
+      latitude: '123.45678',
+      longitude: '123.45678',
+      menus: ['Test Menus'],
+      images: ['Test Images'],
+      homepage: 'Test Homepage',
+      phone: '012-3456-7890',
+    };
+    beforeAll(async () => {
+      await service.addRestaurant(restaurant);
+    });
+
+    it('should update a restaurant', async () => {
+      const id = 1;
+      const updateRestaurant = {
+        name: 'Updated Restaurant',
+        categoryId: 1,
+        kakaoId: '12345678',
+        address: 'Updated Address',
+        latitude: '123.45678',
+        longitude: '123.45678',
+        menus: ['Updated Menus'],
+        images: ['Updated Images'],
+        homepage: 'Updated Homepage',
+        phone: '012-3456-7890',
+      };
+      const res = await service.updateRestaurant(id, updateRestaurant);
+
+      const updatedRestaurant = await service.getRestaurantById(1);
+
+      expect(res.id).toBe(id);
+      expect(updatedRestaurant.restaurant).toEqual({
+        ...updateRestaurant,
+        id,
+        createdAt: expect.any(Date),
+        updatedAt: expect.any(Date),
+      });
+    });
+
+    it('should return null if the restaurant does not exist', async () => {
+      const res = await service.updateRestaurant(2, restaurant);
+      expect(res).toBeNull();
+    });
+
+    it('should throw an error if required fields are missing or invalid', async () => {
+      const updateRestaurant = {
+        name: 'Updated Restaurant',
+        categoryId: 1,
+        kakaoId: 12345678,
+        address: 'Updated Address',
+        latitude: '123.45678',
+        longitude: '123.45678',
+        menus: ['Updated Menus'],
+        images: ['Updated Images'],
+        homepage: 'Updated Homepage',
+      };
+
+      await expect(
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises -- ignore for testing
+        service.updateRestaurant(1, updateRestaurant),
+      ).rejects.toThrow();
+    });
+  });
 });

@@ -17,3 +17,8 @@ export interface IRestaurant extends IAddRestaurantDto {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface IGetRestaurantsDto {
+  limit?: number;
+  offset?: number;
+}
