@@ -1,15 +1,15 @@
-import { ICreateRestaurantDto } from './restaurants';
+import { IAddRestaurantDto } from './restaurants';
 
 export class RestaurantsService {
   constructor(private readonly restaurantsRepository: unknown) {}
 
   async addRestaurant(
-    addRestaurantDto: ICreateRestaurantDto,
+    addRestaurantDto: IAddRestaurantDto,
   ): Promise<{ id: number }> {
-    return { id: 1 };
+    return { id: 0 };
   }
 
   async getRestaurants() {
-    return [];
+    return { count: 0, results: [] };
   }
 }

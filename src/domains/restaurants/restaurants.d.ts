@@ -1,4 +1,4 @@
-export interface ICreateRestaurantDto {
+export interface IAddRestaurantDto {
   name: string;
   categoryId: number;
   kakaoId: string;
@@ -12,7 +12,7 @@ export interface ICreateRestaurantDto {
   phone?: string;
 }
 
-export interface IRestaurant extends ICreateRestaurantDto {
+export interface IRestaurant extends IAddRestaurantDto {
   id: number;
   createdAt: Date;
   updatedAt: Date;
