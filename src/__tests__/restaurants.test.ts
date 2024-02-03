@@ -2,14 +2,15 @@ import {
   IAddRestaurantDto,
   IRestaurant,
 } from 'src/domains/restaurants/restaurants';
+import { RestaurantsRepository } from 'src/domains/restaurants/restaurants.repository';
 import { RestaurantsService } from 'src/domains/restaurants/restaurants.service';
 
 describe('Restaurants API', () => {
   let service: RestaurantsService;
-  let restaurantRepository: IRestaurant[];
+  let restaurantRepository: RestaurantsRepository;
 
   beforeAll(() => {
-    restaurantRepository = [];
+    restaurantRepository = new RestaurantsRepository();
     service = new RestaurantsService(restaurantRepository);
   });
 

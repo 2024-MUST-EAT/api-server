@@ -1,23 +1,25 @@
 import { IAddRestaurantDto, IGetRestaurantsDto } from './restaurants';
+import { RestaurantsRepository } from './restaurants.repository';
 
 export class RestaurantsService {
-  constructor(private readonly restaurantsRepository: unknown) {}
+  constructor(private readonly restaurantsRepository: RestaurantsRepository) {}
 
-  async addRestaurant(
-    addRestaurantDto: IAddRestaurantDto,
-  ): Promise<{ id: number }> {
-    return { id: 0 };
+  async addRestaurant(addRestaurantDto: IAddRestaurantDto) {
+    const id = await this.restaurantsRepository.addRestaurant(addRestaurantDto);
+    return { id };
   }
 
   async getRestaurants(dto?: IGetRestaurantsDto) {
-    return { count: 0, results: [] };
+    const offset = dto?.offset || 0;
+    const limit = dto?.limit || 10;
+    return this.restaurantsRepository.getRestaurants({ offset, limit });
   }
 
   async getRestaurantById(id: number) {
-    return { restaurant: {} };
+    return this.restaurantsRepository.getRestaurantById(id);
   }
 
   async updateRestaurant(id: number, dto: IAddRestaurantDto) {
-    return { id: 0 };
+    return this.restaurantsRepository.updateRestaurant(id, dto);
   }
 }
