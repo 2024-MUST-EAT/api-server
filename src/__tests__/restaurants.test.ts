@@ -9,9 +9,38 @@ describe('Restaurants API', () => {
   let service: RestaurantsService;
   let restaurantRepository: RestaurantsRepository;
 
-  beforeAll(() => {
+  const sampleRestaurants: IAddRestaurantDto[] = [
+    {
+      name: 'Test Restaurant',
+      categoryId: 1,
+      kakaoId: '12345678',
+      address: 'Test Address',
+      latitude: '123.45678',
+      longitude: '123.45678',
+      menus: ['Test Menus'],
+      images: ['Test Images'],
+      homepage: 'Test Homepage',
+      phone: '012-3456-7890',
+    },
+    {
+      name: 'Test Restaurant 2',
+      categoryId: 1,
+      kakaoId: '98765432',
+      address: 'Test Address',
+      latitude: '123.45678',
+      longitude: '123.45678',
+      menus: ['Test Menus'],
+      images: ['Test Images'],
+      homepage: 'Test Homepage',
+      phone: '012-3456-7890',
+    },
+  ];
+  beforeEach(async () => {
     restaurantRepository = new RestaurantsRepository();
     service = new RestaurantsService(restaurantRepository);
+    await Promise.all(
+      sampleRestaurants.map((restaurant) => service.addRestaurant(restaurant)),
+    );
   });
 
   describe('addRestaurant', () => {
@@ -36,40 +65,6 @@ describe('Restaurants API', () => {
   });
 
   describe('getRestaurants', () => {
-    const sampleRestaurants: IAddRestaurantDto[] = [
-      {
-        name: 'Test Restaurant',
-        categoryId: 1,
-        kakaoId: '12345678',
-        address: 'Test Address',
-        latitude: '123.45678',
-        longitude: '123.45678',
-        menus: ['Test Menus'],
-        images: ['Test Images'],
-        homepage: 'Test Homepage',
-        phone: '012-3456-7890',
-      },
-      {
-        name: 'Test Restaurant 2',
-        categoryId: 1,
-        kakaoId: '98765432',
-        address: 'Test Address',
-        latitude: '123.45678',
-        longitude: '123.45678',
-        menus: ['Test Menus'],
-        images: ['Test Images'],
-        homepage: 'Test Homepage',
-        phone: '012-3456-7890',
-      },
-    ];
-    beforeAll(async () => {
-      await Promise.all(
-        sampleRestaurants.map((restaurant) =>
-          service.addRestaurant(restaurant),
-        ),
-      );
-    });
-
     it('should return the correct count of restaurants', async () => {
       const res = await service.getRestaurants();
       expect(res.count).toEqual(2);
@@ -129,13 +124,13 @@ describe('Restaurants API', () => {
       homepage: 'Test Homepage',
       phone: '012-3456-7890',
     };
-    beforeAll(async () => {
-      await service.addRestaurant(restaurant);
+    let expected: { id: number };
+    beforeEach(async () => {
+      expected = await service.addRestaurant(restaurant);
     });
 
     it('should get a restaurant by id', async () => {
-      const res = await service.getRestaurantById(1);
-      expect(res).toHaveLength(1);
+      const res = await service.getRestaurantById(expected.id);
       expect(res.restaurant).toEqual({
         ...restaurant,
         id: expect.any(Number),
@@ -144,9 +139,8 @@ describe('Restaurants API', () => {
       });
     });
 
-    it('should return null if the restaurant does not exist', async () => {
-      const res = await service.getRestaurantById(2);
-      expect(res).toBeNull();
+    it('should throw an Not found error', async () => {
+      await expect(service.getRestaurantById(0)).rejects.toThrow('Not found');
     });
   });
 
@@ -163,24 +157,24 @@ describe('Restaurants API', () => {
       homepage: 'Test Homepage',
       phone: '012-3456-7890',
     };
+    const id = 1;
+    const updateRestaurant = {
+      name: 'Updated Restaurant',
+      categoryId: 1,
+      kakaoId: '12345678',
+      address: 'Updated Address',
+      latitude: '123.45678',
+      longitude: '123.45678',
+      menus: ['Updated Menus'],
+      images: ['Updated Images'],
+      homepage: 'Updated Homepage',
+      phone: '012-3456-7890',
+    };
     beforeAll(async () => {
       await service.addRestaurant(restaurant);
     });
 
     it('should update a restaurant', async () => {
-      const id = 1;
-      const updateRestaurant = {
-        name: 'Updated Restaurant',
-        categoryId: 1,
-        kakaoId: '12345678',
-        address: 'Updated Address',
-        latitude: '123.45678',
-        longitude: '123.45678',
-        menus: ['Updated Menus'],
-        images: ['Updated Images'],
-        homepage: 'Updated Homepage',
-        phone: '012-3456-7890',
-      };
       const res = await service.updateRestaurant(id, updateRestaurant);
 
       const updatedRestaurant = await service.getRestaurantById(1);
@@ -195,15 +189,27 @@ describe('Restaurants API', () => {
     });
 
     it('should return null if the restaurant does not exist', async () => {
-      const res = await service.updateRestaurant(2, restaurant);
-      expect(res).toBeNull();
+      await expect(
+        service.updateRestaurant(0, {
+          name: 'Updated Restaurant',
+          categoryId: 1,
+          kakaoId: '12345678',
+          address: 'Updated Address',
+          latitude: '123.45678',
+          longitude: '123.45678',
+          menus: ['Updated Menus'],
+          images: ['Updated Images'],
+          homepage: 'Updated Homepage',
+          phone: '012-3456-7890',
+        }),
+      ).rejects.toThrow('Not found');
     });
 
     it('should throw an error if required fields are missing or invalid', async () => {
       const updateRestaurant = {
         name: 'Updated Restaurant',
         categoryId: 1,
-        kakaoId: 12345678,
+        // kakaoId: '12345678',
         address: 'Updated Address',
         latitude: '123.45678',
         longitude: '123.45678',
@@ -216,7 +222,7 @@ describe('Restaurants API', () => {
         // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-floating-promises -- ignore for testing
         service.updateRestaurant(1, updateRestaurant),
-      ).rejects.toThrow();
+      ).rejects.toThrow('Missing required field: kakaoId');
     });
   });
 });
