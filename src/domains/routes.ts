@@ -1,13 +1,8 @@
 import { Router } from 'express';
-import { RestaurantController } from './restaurants/restaurants.controller';
-import { RestaurantsService } from './restaurants/restaurants.service';
-import { RestaurantsRepository } from './restaurants/restaurants.repository';
+import restaurantRoute from './restaurants/routes';
 
-const route = Router();
-const service = new RestaurantsService(new RestaurantsRepository());
-const controller = new RestaurantController(service);
+const router = Router();
 
-route.get('/', controller.getRestaurants);
-route.get('/:id', controller.getRestaurantById);
-route.post('/', controller.addRestaurant);
-route.put('/:id', controller.updateRestaurant);
+router.use('/restaurants', restaurantRoute);
+
+export default router;

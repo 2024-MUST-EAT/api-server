@@ -1,6 +1,6 @@
 import express, { Application } from 'express';
 import 'express-async-errors';
-import router from './route';
+import router from './domains/routes';
 
 const app: Application = express();
 
