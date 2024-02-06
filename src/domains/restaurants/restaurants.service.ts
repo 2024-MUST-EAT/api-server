@@ -5,6 +5,7 @@ export class RestaurantsService {
   constructor(private readonly restaurantsRepository: RestaurantsRepository) {}
 
   async addRestaurant(addRestaurantDto: IAddRestaurantDto) {
+    this.validateRestaurant(addRestaurantDto);
     const id = await this.restaurantsRepository.addRestaurant(addRestaurantDto);
     return { id };
   }
