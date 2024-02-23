@@ -30,7 +30,11 @@ router.post('/login', async (req, res) => {
     req.session.save((err) => {
         // 세션 저장 오류 처리 필요
         console.log(err);
-    })
+    });
+
+    console.log(req.session);
+
+    res.status(200).json({message: 'Login Success', id: user.id});
 
 
 });
