@@ -5,7 +5,7 @@ const router = Router();
 
 
 let userId = 1;
-const userTable: { [userId: number] : { email: string, password:string}} = {};
+const userRepository: { id: number, email: string, password: string}[] = [];
 
 router.post('/login', (req, res) => {});
 router.post('/signup', async (req, res) => {
@@ -16,8 +16,11 @@ router.post('/signup', async (req, res) => {
 
     const hashPassword = await bcrypt.hash(password, 12);
 
-    userTable[userId] = { email, password: hashPassword };
+    const user = {id: userId, email: email, password: hashPassword };
+    userRepository.push(user);
     userId++;
+
+    res.status(201).json({id: user.id, email: email});
 
 });
 
