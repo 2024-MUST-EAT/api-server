@@ -1,18 +1,12 @@
 import bcrypt from 'bcrypt';
 
 import { UserData, User } from './auth';
-
-let userId = 1;
-const userRepository: User[] = [];
+import * as authRepository from './auth.repository';
 
 export const doLogin = async (userData: UserData): Promise<User> => {
     const { email, password } = userData;
 
-    const user: User | undefined = userRepository.find(user => user.email = email);
-
-    if(!user) {
-        throw new Error('Not Found User');
-    }
+    const user: User = await authRepository.findByEmail(email);
 
     const isMatch = await bcrypt.compare(password, user.password);
 
@@ -26,11 +20,14 @@ export const doLogin = async (userData: UserData): Promise<User> => {
 export const doSignup = async (userData: UserData): Promise<User> => {
     const { email, password } = userData;
 
+    const existUser = await authRepository.findByEmail(email);
+
+    if(existUser) {
+        throw new Error('Already Exist User');
+    }
+
     const hashPassword = await bcrypt.hash(password, 12);
+    const user = await authRepository.registNewUser({email, password: hashPassword});
 
-    const user: User = {id: userId, email: email, password: hashPassword };
-    userRepository.push(user);
-    userId++;
-
-    return user;
+    return user
 }
