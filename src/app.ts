@@ -1,4 +1,5 @@
 import express, { Application } from 'express';
+import session from 'express-session';
 import 'express-async-errors';
 import router from './domains/routes';
 
@@ -6,6 +7,12 @@ const app: Application = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+app.use(session({
+  secret: 'temp key',
+  resave: false,
+  saveUninitialized: false,
+}))
 
 app.use(router);
 
