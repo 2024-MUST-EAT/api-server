@@ -1,17 +1,19 @@
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
 
+import { User } from './auth';
+
 const router = Router();
 
 
 let userId = 1;
-const userRepository: { id: number, email: string, password: string}[] = [];
+const userRepository: User[] = [];
 
 router.post('/login', async (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
 
-    const user = userRepository.find(user => user.email = email);
+    const user: User | undefined = userRepository.find(user => user.email = email);
 
     if(!user) {
         return new Error('Not Found User');
@@ -46,7 +48,7 @@ router.post('/signup', async (req, res) => {
 
     const hashPassword = await bcrypt.hash(password, 12);
 
-    const user = {id: userId, email: email, password: hashPassword };
+    const user: User = {id: userId, email: email, password: hashPassword };
     userRepository.push(user);
     userId++;
 
